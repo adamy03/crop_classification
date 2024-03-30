@@ -19,7 +19,23 @@ class CropDataset(Dataset):
         h5f = h5py.File(self.path, 'r')
         sample = h5f['samples'][index]
         labels = h5f['labels'][index]
+        labels = one_hot_encode(labels)
         h5f.close()
         
-        return torch.Tensor(sample.astype(float)), torch.Tensor(labels.astype(float))
-        
+        return torch.Tensor(sample.astype(float)), torch.Tensor(labels.astype(int))
+    
+def one_hot_encode(labels):
+    out = np.zeros((3, labels.shape[1], labels.shape[2]), dtype=int)
+    for i in range(labels.shape[1]):
+        for j in range(labels.shape[2]):
+            out[int(labels[0, i, j]), i, j] = 1
+    return out
+
+def un_hot_encode(encoded):
+    out = np.zeros((1, encoded.shape[1], encoded.shape[2]), dtype=int)
+    for c in range(encoded.shape[0]):
+        for i in range(encoded.shape[1]):
+            for j in range(encoded.shape[2]):
+                if encoded[c, i, j]:
+                    out[0, i, j] = c 
+    return out

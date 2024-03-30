@@ -11,7 +11,7 @@ from torch.utils.data import DataLoader, random_split
 from dice_loss import dice_coeff
 
 def train_model(model, 
-          optim, 
+          optimizer, 
           loss_fn, 
           device, 
           epochs, 
@@ -36,10 +36,10 @@ def train_model(model,
             preds = pred_step(samples, model)
             loss, dice = eval_step(preds, labels, loss_fn, True)
             loss.backward()
-            optim.step()
+            optimizer.step()
             
             train_loss_e.append(loss.item())
-            train_dice_e.apped(dice)
+            train_dice_e.append(dice)
             
         model.eval()
         for idx, batch in enumerate(valid_loader):

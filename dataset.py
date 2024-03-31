@@ -6,11 +6,12 @@ import torch
 from torch.utils.data import Dataset
 
 class CropDataset(Dataset):
-    def __init__(self, data_path:str):
+    def __init__(self, data_path, transform=None):
         self.path = data_path
         h5f = h5py.File(self.path, 'r')
         self.len = len(h5f[list(h5f.keys())[0]])
         h5f.close()
+        self.transform = transform
         
     def __len__(self):
         return self.len
@@ -21,8 +22,14 @@ class CropDataset(Dataset):
         labels = h5f['labels'][index]
         labels = one_hot_encode(labels)
         h5f.close()
+        sample, labels = torch.Tensor(sample.astype(float)).type(torch.float), torch.Tensor(labels.astype(int)).type(torch.int)
         
-        return torch.Tensor(sample.astype(float)), torch.Tensor(labels.astype(int))
+        if self.transform:
+            fused = torch.cat((sample, labels))
+            fused = self.transform(fused)
+            sample, labels = fused[0:5], fused[5:8].reshape(3, fused.shape[1], fused.shape[2])
+        
+        return sample, labels
     
 def one_hot_encode(labels):
     out = np.zeros((3, labels.shape[1], labels.shape[2]), dtype=int)

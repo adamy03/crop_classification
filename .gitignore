@@ -1,4 +1,6 @@
 # Data
 data/*
 __pycache__
+report/*
 *.pth
+*.npy

@@ -1,1 +1,1 @@
-Crop Classification Framekwork
+Crop Classification Framework
